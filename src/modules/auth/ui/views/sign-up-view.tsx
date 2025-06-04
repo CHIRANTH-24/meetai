@@ -3,6 +3,7 @@
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OctagonAlert } from "lucide-react";
+import {FaGithub, FaGoogle} from "react-icons/fa";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -58,8 +59,28 @@ export const SignUpView = () => {
       },
       {
         onSuccess: () => {
-          router.push("/");
           setPending(false);
+          router.push("/");
+        },
+        onError: ({ error }) => {
+          setError(error.message);
+        },
+      }
+    );
+  };
+
+  const onSocial = (provider: "github" | "google") => {
+    setError(null);
+    setPending(true);
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          setPending(false);
+          router.push("/");
         },
         onError: ({ error }) => {
           setError(error.message);
@@ -172,10 +193,14 @@ export const SignUpView = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <Button
                     variant="outline"
+                    onClick={() => {
+                      onSocial("google");
+                    }}
                     type="button"
                     className="w-full"
                     disabled={pending}
                   >
+                    <FaGoogle className="h-4 w-4" />
                     Google
                   </Button>
                   <Button
@@ -183,8 +208,12 @@ export const SignUpView = () => {
                     type="button"
                     className="w-full"
                     disabled={pending}
+                    onClick={() => {
+                      onSocial("github");
+                    }}
                   >
-                    Github
+                    <FaGithub className="h-4 w-4" />
+                    GitHub
                   </Button>
                 </div>
                 <div className="text-center text-sm">
